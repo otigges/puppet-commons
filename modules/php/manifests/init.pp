@@ -1,11 +1,15 @@
 class php {
-  
-   package {
-    'php' : ensure => present;
+
+  package {
+    ['php', 'php-mcrypt', 'php-pdo'] :
+      ensure => present,
+      require => Exec['epel-installed'];
   }
-  
-  # rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-  # yum install php-mcrypt
-  # yum install php-pdo
-  
+
+  exec {
+    'epel-installed':
+      command => '/bin/rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm',
+      unless => '/bin/rpm -q epel-release';
+  }
+
 }
