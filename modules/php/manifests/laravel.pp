@@ -2,7 +2,9 @@ define php::laravel(
   $document_root_dir='/var/www/laravel/public/',
   $storage_dir='/var/laravel/',
 ) {
-  
+
+  require database::mysql
+
   file {
     "${storage_dir}" :
       ensure => directory,
@@ -16,12 +18,12 @@ define php::laravel(
     '/opt/laravel/db/init-laravel-db.sql':
       source => 'puppet:///modules/php/init-laravel-db.sql';
   }
-  
+
   exec {
     'laraval-db-initialized' :
       command => '/usr/bin/mysql < /opt/laravel/db/init-laravel-db.sql && touch /opt/laravel/db/db-creted.info',
       creates => '/opt/laravel/db/db-creted.info',
       require => File['/opt/laravel/db/init-laravel-db.sql'];
   }
-  
+
 }
