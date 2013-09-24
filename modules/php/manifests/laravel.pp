@@ -1,6 +1,6 @@
 define php::laravel(
   $document_root_dir='/var/www/laravel/public/',
-  $storage_dir='/var/laravel/',
+  $storage_dir='/var/laravel/storage/',
 ) {
 
   require database::mysql
