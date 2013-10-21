@@ -1,11 +1,14 @@
 define php::laravel(
   $document_root_dir='/var/www/laravel/public/',
-  $storage_dir='/var/laravel/storage/',
+  $storage_dir='/var/laravel/storage',
 ) {
 
   require database::mysql
 
   file {
+    "/var/laravel" :
+      ensure => directory,
+      owner => 'apache';
     "${storage_dir}" :
       ensure => directory,
       owner => 'apache';
