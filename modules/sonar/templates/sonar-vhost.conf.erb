@@ -1,0 +1,15 @@
+NameVirtualHost *:80
+
+<VirtualHost *:80>
+
+  ServerName sonar.local
+  
+  LogLevel  warn
+  ErrorLog  logs/<%= context %>_error.log
+  CustomLog logs/<%= context %>_access.log combined
+    
+  ProxyPass           /<%= context %>     http://<%= target_host %>:<%= target_port %>/<%= target_context %> \
+                                                      connectiontimeout=5 timeout=30
+  ProxyPassReverse    /<%= context %>     http://<%= target_host %>:<%= target_port %>/<%= target_context %>  
+
+</VirtualHost>
