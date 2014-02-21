@@ -81,6 +81,40 @@ class sonar() {
     }
 }
 
+class sonar::runner() {
+  
+  require sonar
+  
+  $target_dir = "/opt/sonar"
+  $runner_home = "/opt/sonar/runner"
+  $version = '2.3'
+  $url = "http://repo1.maven.org/maven2/org/codehaus/sonar/runner/sonar-runner-dist/${version}/sonar-runner-dist-${version}.zip"
+  
+  wget::fetch { 
+    "sonar-runner-${version}":
+      source => $url, 
+      destination => "/tmp/sonar-runner-dist-${version}.zip";      
+  }
+  
+  exec {
+    'unpack-sonar-runner':
+      command => "/usr/bin/unzip /tmp/sonar-runner-dist-${version}.zip -d ${target_dir} && chown -R sonar:sonar ${target_dir}",
+      creates => "/opt/sonar/sonar-runner-${version}",
+      require => [
+        File[$target_dir],
+        User['sonar'],
+        Wget::Fetch["sonar-runner-${version}"]
+      ];
+  }
+  
+  file {
+    "${runner_home}" : 
+      ensure => link,
+      target => "/opt/sonar/sonar-runner-${version}";
+  }
+  
+}
+
 class sonar::php() {
   
   require sonar
@@ -88,7 +122,8 @@ class sonar::php() {
   $version = '1.2'
   $url = "http://repository.codehaus.org/org/codehaus/sonar-plugins/php/sonar-php-plugin/${version}/sonar-php-plugin-${version}.jar"
   
-  wget::fetch { "sonar-php-${version}":
+  wget::fetch { 
+    "sonar-php-${version}":
       source => $url, 
       destination => "/opt/sonar/sonarqube/extensions/plugins/sonar-php-plugin-${version}.jar";      
   }
@@ -96,11 +131,11 @@ class sonar::php() {
 }
 
 define sonar::download ($version){
-    wget::fetch { 
-        "sonar-${version}":
-        source => "http://dist.sonar.codehaus.org/sonarqube-${version}.zip", 
-        destination => "/tmp/sonar-${version}.zip";
-    }
+  wget::fetch { 
+    "sonar-${version}":
+      source => "http://dist.sonar.codehaus.org/sonarqube-${version}.zip", 
+      destination => "/tmp/sonar-${version}.zip";
+  }
 }
 
 class wget() {
