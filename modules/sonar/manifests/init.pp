@@ -35,7 +35,6 @@ class sonar() {
     file { 
         "${target_dir}":
             owner => "sonar", group => "sonar", mode => 750,
-            recurse => true,
             ensure => directory;
         "${target_dir}/scripts":
             owner => "sonar", group => "sonar", mode => 750,
@@ -66,8 +65,8 @@ class sonar() {
             creates => $sonar_home,
             require => [File[$target_dir],User['sonar']];
         'init-db':
-            command => "/usr/bin/mysql < ${target_dir}/scripts/init-mysql.sql && touch ${sonar_home}/mysql.init.status",
-            creates => "${sonar_home}/mysql.init.status",
+            command => "/usr/bin/mysql < ${target_dir}/scripts/init-mysql.sql",
+            unless  => "/usr/bin/mysqlshow | /bin/grep ' sonar '",
             require => [Service['mysqld'],File["${target_dir}/scripts/init-mysql.sql"]];
     }
     
@@ -130,35 +129,25 @@ class sonar::php() {
   
 }
 
+class sonar::python() {
+  
+  require sonar
+  
+  $version = '1.1'
+  $url = "http://repository.codehaus.org/org/codehaus/sonar-plugins/python/sonar-python-plugin/${version}/sonar-python-plugin-${version}.jar"
+  
+  wget::fetch { 
+    "sonar-python-${version}":
+      source => $url, 
+      destination => "/opt/sonar/sonarqube/extensions/plugins/sonar-python-plugin-${version}.jar";      
+  }
+  
+}
+
 define sonar::download ($version){
   wget::fetch { 
     "sonar-${version}":
       source => "http://dist.sonar.codehaus.org/sonarqube-${version}.zip", 
       destination => "/tmp/sonar-${version}.zip";
-  }
-}
-
-class wget() {
-
-  package { 
-    'wget': ensure => latest; 
-  }
-}
-
-define wget::fetch($source,$destination) {
-  
-  require wget
-  
-  if $http_proxy {
-      exec { "wget-$name":
-          command => "/usr/bin/wget --output-document=$destination $source",
-          creates => $destination,
-          environment => [ "HTTP_PROXY=$http_proxy", "http_proxy=$http_proxy" ],
-      }
-  } else {
-      exec { "wget-$name":
-          command => "/usr/bin/wget --output-document=$destination $source",
-          creates => $destination,
-      }
   }
 }

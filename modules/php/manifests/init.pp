@@ -1,7 +1,7 @@
 class php {
 
   package {
-    ['php', 'php-mcrypt', 'php-pdo', 'php-mbstring', 'php-mysql', 'php-xml'] :
+    ['php', 'php-mcrypt', 'php-pdo', 'php-mbstring', 'php-mysql', 'php-xml', 'php-gd'] :
       ensure => present,
       require => Exec['epel-installed'];
   }
