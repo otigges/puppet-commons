@@ -131,6 +131,10 @@ class sonar::php() {
 
 class sonar::python() {
   
+  package {
+    'pylint' : ensure => present
+  }
+  
   require sonar
   
   $version = '1.1'
