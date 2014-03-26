@@ -12,6 +12,7 @@ class database::mysql {
 
   service { 'mysqld':
     ensure => running,
+    enable => true,
     provider => 'redhat',
     subscribe => File["/etc/my.cnf"],
     require => Package["mysql-server"]

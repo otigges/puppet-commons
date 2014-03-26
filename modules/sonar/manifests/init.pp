@@ -73,6 +73,7 @@ class sonar() {
     service {
       'sonar':
         ensure => running,
+        enable => true,
         require => [
           Exec['unpack-sonar', 'init-db'],
           File["${sonar_home}/conf/sonar.properties"]
@@ -130,22 +131,37 @@ class sonar::php() {
 }
 
 class sonar::python() {
-  
+
   package {
     'pylint' : ensure => present
   }
-  
+
   require sonar
-  
+
   $version = '1.1'
   $url = "http://repository.codehaus.org/org/codehaus/sonar-plugins/python/sonar-python-plugin/${version}/sonar-python-plugin-${version}.jar"
-  
+
   wget::fetch { 
     "sonar-python-${version}":
       source => $url, 
-      destination => "/opt/sonar/sonarqube/extensions/plugins/sonar-python-plugin-${version}.jar";      
+      destination => "/opt/sonar/sonarqube/extensions/plugins/sonar-python-plugin-${version}.jar";
   }
-  
+
+}
+
+class sonar::js() {
+
+  require sonar
+
+  $version = '1.5'
+  $url = "http://repository.codehaus.org/org/codehaus/sonar-plugins/javascript/sonar-javascript-plugin/${version}/sonar-javascript-plugin-${version}.jar"
+
+  wget::fetch { 
+    "sonar-js-${version}":
+      source => $url, 
+      destination => "/opt/sonar/sonarqube/extensions/plugins/sonar-javascript-plugin-${version}.jar";
+  }
+
 }
 
 define sonar::download ($version){
